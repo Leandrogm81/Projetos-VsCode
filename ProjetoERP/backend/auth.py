@@ -4,6 +4,11 @@ import jwt
 import datetime
 from functools import wraps
 
+# Configurar logging básico
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 # Simple in-memory user store for demo (use database in production)
 users = {
     'admin': {

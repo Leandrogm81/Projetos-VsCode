@@ -7,6 +7,10 @@ import os
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'sua-chave-secreta-aqui-mude-em-producao'  # Change this in production!
 
+# Configurar CORS para permitir requisições do frontend
+from flask_cors import CORS
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 # Configurar logging básico
 import logging
 logging.basicConfig(level=logging.DEBUG)

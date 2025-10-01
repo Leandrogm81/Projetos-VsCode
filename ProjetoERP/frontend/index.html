@@ -65,6 +65,19 @@
     </style>
 </head>
 <body>
+    &lt;div id="loginModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);"&gt;
+      &lt;div style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 300px; border-radius: 5px;"&gt;
+        &lt;h2 style="text-align: center;"&gt;Login Necessário&lt;/h2&gt;
+        &lt;form id="loginForm"&gt;
+          &lt;label for="username"&gt;Usuário:&lt;/label&gt;&lt;br&gt;
+          &lt;input type="text" id="username" name="username" required style="width: 100%; padding: 8px; margin: 5px 0;"&gt;&lt;br&gt;
+          &lt;label for="password"&gt;Senha:&lt;/label&gt;&lt;br&gt;
+          &lt;input type="password" id="password" name="password" required style="width: 100%; padding: 8px; margin: 5px 0;"&gt;&lt;br&gt;
+          &lt;button type="submit" style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px;"&gt;Entrar&lt;/button&gt;
+        &lt;/form&gt;
+        &lt;p style="text-align: center; margin-top: 10px;"&gt;Usuário de teste: admin / admin123&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
     <div class="navigation">
         <a href="index.html">Módulo Projetos</a>
         <a href="dashboard.html">Dashboard</a>
