@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo Projetos - Toldos Fortaleza</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .kanban-board {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+        }
+        .kanban-column {
+            background-color: white;
+            border-radius: 5px;
+            padding: 15px;
+            min-width: 250px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .kanban-column h3 {
+            margin-top: 0;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+        .project-card {
+            background-color: #f9f9f9;
+            border-left: 4px solid #007bff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+        }
+        .project-card h4 {
+            margin: 0 0 5px 0;
+        }
+        .project-card p {
+            margin: 2px 0;
+            font-size: 0.9em;
+            color: #555;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            color: white;
+        }
+        .status-aguardando { background-color: #ffc107; }
+        .status-fabricacao { background-color: #17a2b8; }
+        .status-instalacao { background-color: #28a745; }
+        .status-finalizado { background-color: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="navigation">
+        <a href="index.html">Módulo Projetos</a>
+        <a href="dashboard.html">Dashboard</a>
+    </div>
+
+    <div class="header">
+        <h1>Módulo de Projetos - Toldos Fortaleza</h1>
+        <p>Gestão de Ordens de Serviço</p>
+    </div>
+
+    <div class="kanban-board">
+        <div class="kanban-column">
+            <h3>Aguardando Medição</h3>
+            <!-- Projects will be dynamically inserted here -->
+        </div>
+
+        <div class="kanban-column">
+            <h3>Em Fabricação</h3>
+            <!-- Projects will be dynamically inserted here -->
+        </div>
+
+        <div class="kanban-column">
+            <h3>Aguardando Instalação</h3>
+            <!-- Projects will be dynamically inserted here -->
+        </div>
+
+        <div class="kanban-column">
+            <h3>Instalação Agendada</h3>
+            <!-- Projects will be dynamically inserted here -->
+        </div>
+
+        <div class="kanban-column">
+            <h3>Finalizado</h3>
+            <!-- Projects will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script>
+        // JavaScript to fetch data from API and populate the Kanban board
+        async function carregarProjetos() {
+            try {
+                const response = await fetch('http://localhost:5000/api/projetos');
+                const projetos = await response.json();
+                
+                // Clear existing content
+                document.querySelectorAll('.kanban-column').forEach(column => {
+                    while (column.firstChild && !column.firstChild.matches('h3')) {
+                        column.removeChild(column.firstChild);
+                    }
+                });
+                
+                // Sort projects by status and add to corresponding columns
+                projetos.forEach(projeto => {
+                    const status = projeto.status || 'Aguardando Medição';
+                    const column = Array.from(document.querySelectorAll('.kanban-column h3'))
+                        .find(h3 => h3.textContent.includes(status))
+                        .closest('.kanban-column');
+                    
+                    const projectCard = document.createElement('div');
+                    projectCard.className = 'project-card';
+                    projectCard.innerHTML = `
+                        <h4>${projeto.cliente || 'Cliente'}</h4>
+                        <p><strong>Produto:</strong> ${projeto.produto || 'Produto'}</p>
+                        <p><strong>Agendamento:</strong> ${projeto.agendamento || 'Data'}</p>
+                        <span class="status-badge status-${status.toLowerCase().replace(' ', '-')}">${status}</span>
+                    `;
+                    
+                    column.appendChild(projectCard);
+                });
+                
+            } catch (error) {
+                console.error('Erro ao carregar projetos:', error);
+            }
+        }
+
+        // Load projects when page loads
+        document.addEventListener('DOMContentLoaded', carregarProjetos);
+    </script>
+</body>
+</html>

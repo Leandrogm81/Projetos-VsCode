@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Toldos Fortaleza</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .kpi-card {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .kpi-card h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .kpi-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+            margin: 10px 0;
+        }
+        .kpi-label {
+            color: #555;
+            font-size: 0.9em;
+        }
+        .navigation {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .navigation a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .navigation a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="navigation">
+        <a href="index.html">Módulo Projetos</a>
+        <a href="dashboard.html">Dashboard</a>
+    </div>
+
+    <div class="header">
+        <h1>Dashboard - Toldos Fortaleza</h1>
+        <p>Visão Geral do Negócio</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="kpi-card">
+            <h3>Orçamentos do Mês</h3>
+            <div class="kpi-value" id="total-orcamentos">0</div>
+            <div class="kpi-label">Valor total em orçamentos enviados</div>
+        </div>
+
+        <div class="kpi-card">
+            <h3>Vendas Fechadas</h3>
+            <div class="kpi-value" id="vendas-fechadas">0</div>
+            <div class="kpi-label">Número de vendas concluídas</div>
+        </div>
+
+        <div class="kpi-card">
+            <h3>Faturamento</h3>
+            <div class="kpi-value" id="faturamento-mes">R$ 0</div>
+            <div class="kpi-label">Faturamento deste mês</div>
+        </div>
+
+        <div class="kpi-card">
+            <h3>Projetos em Andamento</h3>
+            <div class="kpi-value" id="projetos-andamento">0</div>
+            <div class="kpi-label">Projetos não finalizados</div>
+        </div>
+
+        <div class="kpi-card">
+            <h3>Contas a Vencer</h3>
+            <div class="kpi-value" id="contas-vencer">0</div>
+            <div class="kpi-label">Contas a receber na semana</div>
+        </div>
+    </div>
+
+    <script>
+        async function carregarKPIs() {
+            try {
+                const response = await fetch('http://localhost:5000/api/dashboard/kpis');
+                const data = await response.json();
+                
+                document.getElementById('total-orcamentos').textContent = `R$ ${data.total_orcamentos_mes.toLocaleString('pt-BR')}`;
+                document.getElementById('vendas-fechadas').textContent = data.vendas_fechadas;
+                document.getElementById('faturamento-mes').textContent = `R$ ${data.faturamento_mes.toLocaleString('pt-BR')}`;
+                document.getElementById('projetos-andamento').textContent = data.projetos_andamento;
+                document.getElementById('contas-vencer').textContent = data.contas_vencendo_semana;
+            } catch (error) {
+                console.error('Erro ao carregar KPIs:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarKPIs);
+    </script>
+</body>
+</html>
