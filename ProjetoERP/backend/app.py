@@ -7,6 +7,14 @@ import os
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'sua-chave-secreta-aqui-mude-em-producao'  # Change this in production!
 
+# Configurar logging básico
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+print("=== Inicializando servidor Flask ===")
+logger.info("Aplicação Flask iniciada com sucesso")
+
 # Dados simulados para o módulo Projetos (Ordens de Serviço)
 ordens_servico = [
     {
@@ -75,6 +83,8 @@ lancamentos_financeiros = [
 
 @app.route('/')
 def home():
+    print("Acessando rota raiz '/'")
+    logger.info("Requisição para rota home")
     return "Sistema de Gestão Integrada - Toldos Fortaleza"
 
 @app.route('/api/login', methods=['POST'])
@@ -106,8 +116,15 @@ def login():
     return jsonify({'message': 'Credenciais inválidas!'}), 401
 
 @app.route('/api/projetos', methods=['GET'])
+def projetos_wrapper(*args, **kwargs):
+    print("Requisição recebida para /api/projetos")
+    logger.info("Tentando acessar /api/projetos")
+    return listar_projetos(*args, **kwargs)
+
 @token_required
 def listar_projetos(current_user):
+    print(f"Autenticação OK para listar_projetos. Usuário: {current_user['username']}")
+    logger.info(f"Listando projetos para usuário: {current_user['username']}")
     return jsonify(ordens_servico)
 
 @app.route('/api/projetos', methods=['POST'])
@@ -189,8 +206,15 @@ def relatorios_financeiros(current_user):
 
 # Endpoints para o Dashboard
 @app.route('/api/dashboard/kpis', methods=['GET'])
+def kpis_wrapper(*args, **kwargs):
+    print("Requisição recebida para /api/dashboard/kpis")
+    logger.info("Tentando acessar /api/dashboard/kpis")
+    return dashboard_kpis(*args, **kwargs)
+
 @token_required
 def dashboard_kpis(current_user):
+    print(f"Autenticação OK para dashboard_kpis. Usuário: {current_user['username']}")
+    logger.info(f"Carregando KPIs para usuário: {current_user['username']}")
     from datetime import datetime, timedelta
     
     # 1. Valor total em orçamentos enviados no mês
@@ -279,6 +303,15 @@ def limpar_backups_antigos(current_user):
         return jsonify({'message': f'Erro ao limpar backups: {str(e)}'}), 500
 
 if __name__ == '__main__':
-    # Iniciar agendamento automático de backups
-    backup_scheduler = backup.iniciar_agendamento_backup(ordens_servico, orcamentos, lancamentos_financeiros)
-    app.run(debug=True)
+    try:
+        # Iniciar agendamento automático de backups
+        print("Iniciando scheduler de backup...")
+        backup_scheduler = backup.iniciar_agendamento_backup(ordens_servico, orcamentos, lancamentos_financeiros)
+        print("Scheduler de backup iniciado com sucesso")
+        logger.info("Scheduler de backup ativo")
+    except Exception as e:
+        print(f"Erro ao iniciar scheduler de backup: {e}")
+        logger.error(f"Falha no scheduler: {e}")
+    
+    print("Iniciando servidor Flask na porta 5000...")
+    app.run(debug=True, host='0.0.0.0')

@@ -43,17 +43,28 @@ def token_required(f):
     """Decorator para exigir token JWT válido"""
     @wraps(f)
     def decorated(*args, **kwargs):
+        print("Verificando token de autenticação...")
+        logger.info("Iniciando verificação de token")
         token = None
         
         # Verificar se o token está no header Authorization
         if 'Authorization' in request.headers:
             auth_header = request.headers['Authorization']
+            print(f"Header Authorization encontrado: {auth_header}")
             try:
                 token = auth_header.split(" ")[1]  # Bearer <token>
+                print(f"Token extraído: {token[:20]}...")  # Log parcial por segurança
             except IndexError:
+                print("Formato de token inválido!")
+                logger.warning("Formato de Authorization inválido")
                 return jsonify({'message': 'Formato de token inválido! Use: Bearer <token>'}), 401
+        else:
+            print("Nenhum header Authorization encontrado")
+            logger.warning("Requisição sem token de autenticação")
         
         if not token:
+            print("Token ausente - retornando 401")
+            logger.warning("Token de acesso obrigatório não fornecido")
             return jsonify({'message': 'Token de acesso é obrigatório!'}), 401
         
         try:
@@ -64,9 +75,15 @@ def token_required(f):
                 'role': data['role'],
                 'name': data['name']
             }
+            print(f"Token válido! Usuário: {current_user['username']}, Role: {current_user['role']}")
+            logger.info(f"Autenticação bem-sucedida para {current_user['username']}")
         except jwt.ExpiredSignatureError:
+            print("Token expirado!")
+            logger.warning("Token JWT expirado")
             return jsonify({'message': 'Token expirado!'}), 401
         except jwt.InvalidTokenError:
+            print("Token inválido!")
+            logger.error("Token JWT inválido")
             return jsonify({'message': 'Token inválido!'}), 401
         
         return f(current_user, *args, **kwargs)
